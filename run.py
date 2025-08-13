@@ -154,8 +154,7 @@ class MidiSoundPlayer:
 if __name__ == "__main__":
     config = MidiSoundConfig(
         note_map={
-            60: SOUNDS_DIR / "birthday.wav",
-            62: SOUNDS_DIR / "awawa.wav",
+            62: SOUNDS_DIR / "awawa.mp3",
             64: SOUNDS_DIR / "Scratch 1.wav",
             65: SOUNDS_DIR / "Random Noise 1.wav",
             66: SOUNDS_DIR / "Vox 1.wav",
