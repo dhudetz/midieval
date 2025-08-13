@@ -22,8 +22,13 @@ class PitchShiftFill(Enum):
 
 @dataclass
 class MidiSoundConfig:
-    note_map: dict               # {note_number: "path/to/file.mp3"}
+    note_map: dict                   # {note_number: "path/to/file.mp3"}
     pitch_shift_fill: PitchShiftFill = PitchShiftFill.FORWARD
+    mixer_frequency: int = 44100      # sample rate
+    mixer_size: int = -16            # 16-bit signed
+    mixer_channels: int = 2           # stereo
+    mixer_buffer: int = 512           # buffer size
+    num_channels: int = 64            # max simultaneous sounds
 
 # --- MIDI Interface ---
 class MidiInterface:
@@ -52,7 +57,17 @@ class MidiInterface:
 class MidiSoundPlayer:
     def __init__(self, config: MidiSoundConfig):
         self.config = config
+
+        # High-performance mixer initialization
+        pygame.mixer.pre_init(
+            frequency=self.config.mixer_frequency,
+            size=self.config.mixer_size,
+            channels=self.config.mixer_channels,
+            buffer=self.config.mixer_buffer
+        )
         pygame.mixer.init()
+        pygame.mixer.set_num_channels(self.config.num_channels)
+
         self.sounds = {}
         self._preload_sounds()
         if self.config.pitch_shift_fill != PitchShiftFill.OFF:
@@ -137,14 +152,15 @@ class MidiSoundPlayer:
 if __name__ == "__main__":
     config = MidiSoundConfig(
         note_map={
-            62: "sounds/awawa.mp3",
+            69: "sounds/awawa.mp3",
             64: "sounds/Scratch 1.wav",
             65: "sounds/Random Noise 1.wav",
             66: "sounds/Vox 1.wav",
             67: "sounds/Synth 1.wav",
             68: "sounds/Synth 2.wav",
         },
-        pitch_shift_fill=PitchShiftFill.BACKWARD
+        pitch_shift_fill=PitchShiftFill.FORWARD,
+        num_channels=64  # Increase for heavy polyphony
     )
 
     midi = MidiInterface()
