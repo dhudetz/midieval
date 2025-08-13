@@ -14,6 +14,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# --- Constants ---
+SOUNDS_DIR = Path("sounds")
+
 # --- Enums and Config ---
 class PitchShiftFill(Enum):
     OFF = 0
@@ -22,7 +25,7 @@ class PitchShiftFill(Enum):
 
 @dataclass
 class MidiSoundConfig:
-    note_map: dict                   # {note_number: "path/to/file.mp3"}
+    note_map: dict                   # {note_number: Path("path/to/file")}
     pitch_shift_fill: PitchShiftFill = PitchShiftFill.FORWARD
     mixer_frequency: int = 44100      # sample rate
     mixer_size: int = -16            # 16-bit signed
@@ -74,9 +77,8 @@ class MidiSoundPlayer:
             self._fill_unassigned_keys()
 
     def _preload_sounds(self):
-        for note, path_str in self.config.note_map.items():
-            if path_str:
-                path = Path(path_str)
+        for note, path in self.config.note_map.items():
+            if path:
                 if path.exists():
                     try:
                         self.sounds[note] = pygame.mixer.Sound(str(path))
@@ -152,15 +154,17 @@ class MidiSoundPlayer:
 if __name__ == "__main__":
     config = MidiSoundConfig(
         note_map={
-            69: "sounds/awawa.mp3",
-            64: "sounds/Scratch 1.wav",
-            65: "sounds/Random Noise 1.wav",
-            66: "sounds/Vox 1.wav",
-            67: "sounds/Synth 1.wav",
-            68: "sounds/Synth 2.wav",
+            60: SOUNDS_DIR / "birthday.wav",
+            62: SOUNDS_DIR / "awawa.wav",
+            64: SOUNDS_DIR / "Scratch 1.wav",
+            65: SOUNDS_DIR / "Random Noise 1.wav",
+            66: SOUNDS_DIR / "Vox 1.wav",
+            67: SOUNDS_DIR / "Synth 1.wav",
+            68: SOUNDS_DIR / "Synth 2.wav",
+            69: SOUNDS_DIR / "chris.wav",
         },
         pitch_shift_fill=PitchShiftFill.FORWARD,
-        num_channels=64  # Increase for heavy polyphony
+        num_channels=64
     )
 
     midi = MidiInterface()
